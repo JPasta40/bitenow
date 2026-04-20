@@ -1,4 +1,3 @@
-// api/places.js
 export default async function handler(req) {
   try {
     const params = Object.fromEntries(new URL(req.url).searchParams);
@@ -15,7 +14,7 @@ export default async function handler(req) {
     const key = process.env.GOOGLE_PLACES_API_KEY;
 
     if (!key) {
-      return new Response(JSON.stringify({ error: "GOOGLE_PLACES_API_KEY missing in Vercel env vars" }), {
+      return new Response(JSON.stringify({ error: "GOOGLE_PLACES_API_KEY is missing from Vercel environment variables" }), {
         status: 500,
         headers: { "Content-Type": "application/json" }
       });
