@@ -9,27 +9,27 @@
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; }
     .glass-card {
-      background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,0.12);
-      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.6);
+      background: rgba(255,255,255,0.09);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 15px 35px -10px rgba(0,0,0,0.5);
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .glass-card:hover { transform: translateY(-8px); box-shadow: 0 25px 50px -15px rgba(239,68,68,0.25); }
+    .glass-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 25px 60px -15px rgba(239,68,68,0.35); }
     .glass-btn { background: linear-gradient(145deg, #ef4444, #b91c1c); }
+    .hero-text { background: linear-gradient(90deg, #fff, #f3f4f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   </style>
 </head>
 <body class="bg-zinc-950 text-white min-h-screen pb-20">
 
-  <!-- Improved Header -->
+  <!-- Header -->
   <div class="bg-black sticky top-0 z-50 border-b border-red-900/50">
-    <div class="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="max-w-2xl mx-auto px-6 py-5 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <img src="rushplate-logo.png" alt="RushPlate" class="w-11 h-11 rounded-2xl shadow-xl">
-        <h1 class="text-3xl font-bold tracking-tighter">RushPlate</h1>
+        <h1 class="text-3xl font-bold tracking-tighter hero-text">RushPlate</h1>
       </div>
-      <button onclick="getLiveLocation()" 
-              class="glass-btn text-white px-5 py-2.5 rounded-3xl text-sm font-semibold flex items-center gap-2">
+      <button onclick="getLiveLocation()" class="glass-btn text-white px-6 py-3 rounded-3xl text-sm font-semibold flex items-center gap-2">
         <i class="fa-solid fa-location-dot"></i>
         <span id="location-text">Providence, RI</span>
       </button>
@@ -38,13 +38,11 @@
 
   <div class="max-w-2xl mx-auto px-4 pt-8">
 
-    <!-- Viral Reviews -->
-    <div class="glass-card rounded-3xl p-6 mb-8">
-      <div class="flex items-center gap-3 mb-4">
-        <i class="fa-solid fa-fire text-red-500 text-xl"></i>
-        <h3 class="font-semibold text-lg">Viral Reviews</h3>
-      </div>
-      <a href="https://www.tiktok.com/@discoverymatt/video/7553811230767467807" target="_blank" class="block glass-card p-4 rounded-2xl text-sm">Highest-Rated Spots in Providence (165K+ views)</a>
+    <!-- Rush Radar -->
+    <div class="glass-card rounded-3xl p-6 mb-8 text-center">
+      <p class="text-red-400 text-sm font-medium tracking-widest">RUSH RADAR</p>
+      <h2 class="text-4xl font-bold mt-2">Fastest bite right now</h2>
+      <div id="radar" class="mt-6 text-2xl font-semibold text-red-400">Loading best deal...</div>
     </div>
 
     <!-- Meal Toggle -->
@@ -55,7 +53,7 @@
 
     <div id="results" class="space-y-6"></div>
 
-    <div class="text-center text-xs text-zinc-500 mt-16 mb-8">
+    <div class="text-center text-xs text-zinc-500 mt-20 mb-12">
       <a href="privacy.html" class="hover:text-red-400">Privacy Policy</a>
     </div>
   </div>
@@ -90,8 +88,7 @@
 
     let restaurants = {
       lunch: [
-        {
-          id: 1, name: "Chipotle", cuisine: "Mexican", dist: "0.4", price: 9, wait: 7, rating: "4.6",
+        { id: 1, name: "Chipotle", cuisine: "Mexican", dist: "0.4", price: 9, wait: 7, rating: "4.6",
           thumbnail: "https://picsum.photos/id/1015/600/300",
           reviewLink: "https://www.instagram.com/reel/C8xYkL2pQjK/",
           menu: [
@@ -99,8 +96,7 @@
             {name: "Steak Tacos (3)", price: 9.75, description: "Corn tortillas, grilled steak, cilantro, onion, lime"}
           ]
         },
-        {
-          id: 2, name: "Shake Shack", cuisine: "Burgers", dist: "1.8", price: 11, wait: 12, rating: "4.7",
+        { id: 2, name: "Shake Shack", cuisine: "Burgers", dist: "1.8", price: 11, wait: 12, rating: "4.7",
           thumbnail: "https://picsum.photos/id/201/600/300",
           reviewLink: "https://www.instagram.com/reel/D2vPqR9mN8L/",
           menu: [
@@ -110,8 +106,7 @@
         }
       ],
       dinner: [
-        {
-          id: 3, name: "Federal Hill Pizza", cuisine: "Italian", dist: "1.1", price: 12, wait: 14, rating: "4.8",
+        { id: 3, name: "Federal Hill Pizza", cuisine: "Italian", dist: "1.1", price: 12, wait: 14, rating: "4.8",
           thumbnail: "https://picsum.photos/id/251/600/300",
           reviewLink: "https://www.instagram.com/reel/C9kLmPqRtYv/",
           menu: [
@@ -119,8 +114,7 @@
             {name: "Pepperoni Pizza", price: 13.49, description: "Classic pepperoni, mozzarella"}
           ]
         },
-        {
-          id: 4, name: "Pho 75", cuisine: "Vietnamese", dist: "1.3", price: 10, wait: 10, rating: "4.6",
+        { id: 4, name: "Pho 75", cuisine: "Vietnamese", dist: "1.3", price: 10, wait: 10, rating: "4.6",
           thumbnail: "https://picsum.photos/id/301/600/300",
           reviewLink: "https://www.instagram.com/reel/D1mNqRtYvPq/",
           menu: [
@@ -214,7 +208,7 @@
         </div>
         <div class="glass-card p-6 rounded-3xl">
           <h4 class="font-semibold mb-3">Instructions</h4>
-          <p class="text-zinc-300">1. Prepare base (rice, pasta, or bun)<br>2. Cook protein and vegetables<br>3. Add sauce and toss<br>4. Assemble and serve hot</p>
+          <p class="text-zinc-300">1. Prepare base<br>2. Cook protein and vegetables<br>3. Add sauce and toss<br>4. Assemble and serve hot</p>
         </div>
         <button onclick="hideDiyModal()" class="w-full py-5 glass-btn rounded-3xl font-semibold mt-8">Start Cooking</button>
       `;
