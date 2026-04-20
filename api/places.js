@@ -1,3 +1,4 @@
+// api/places.js
 export default async function handler(req) {
   try {
     const params = Object.fromEntries(new URL(req.url).searchParams);
@@ -31,7 +32,7 @@ export default async function handler(req) {
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("Proxy error:", err);
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
       headers: { "Content-Type": "application/json" }
