@@ -12,35 +12,23 @@
       background: rgba(255,255,255,0.08);
       backdrop-filter: blur(16px);
       border: 1px solid rgba(255,255,255,0.12);
-      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.6),
-                  inset 0 2px 10px rgba(255,255,255,0.08);
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.6);
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .glass-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 25px 50px -15px rgba(239, 68, 68, 0.25);
-    }
-    .glass-btn {
-      background: linear-gradient(145deg, #ef4444, #b91c1c);
-      transition: all 0.3s;
-    }
-    .glass-btn:hover {
-      transform: scale(1.03);
-      box-shadow: 0 10px 20px -5px rgba(239, 68, 68, 0.4);
-    }
+    .glass-card:hover { transform: translateY(-8px); box-shadow: 0 25px 50px -15px rgba(239,68,68,0.25); }
+    .glass-btn { background: linear-gradient(145deg, #ef4444, #b91c1c); }
   </style>
 </head>
 <body class="bg-zinc-950 text-white min-h-screen pb-20">
 
-  <!-- Header with Locked Logo -->
+  <!-- Header -->
   <div class="bg-black sticky top-0 z-50 border-b border-red-900/50">
     <div class="max-w-2xl mx-auto px-6 py-5 flex items-center justify-between">
       <div class="flex items-center gap-4">
         <img src="bitenow-logo.png" alt="BiteNow" class="w-12 h-12 rounded-3xl shadow-2xl">
         <h1 class="text-4xl font-bold tracking-tighter">BiteNow</h1>
       </div>
-      <button onclick="getLiveLocation()" 
-              class="glass-btn text-white px-6 py-3 rounded-3xl text-sm font-semibold flex items-center gap-2">
+      <button onclick="getLiveLocation()" class="glass-btn text-white px-6 py-3 rounded-3xl text-sm font-semibold flex items-center gap-2">
         <i class="fa-solid fa-location-dot"></i>
         <span id="location-text">Providence, RI</span>
       </button>
@@ -55,23 +43,17 @@
         <i class="fa-solid fa-fire text-red-500 text-xl"></i>
         <h3 class="font-semibold text-lg">Viral Reviews</h3>
       </div>
-      <a href="https://www.tiktok.com/@discoverymatt/video/7553811230767467807" target="_blank" 
-         class="block glass-card p-4 rounded-2xl text-sm hover:bg-white/5">
-        Highest-Rated Spots in Providence (165K+ views)
-      </a>
+      <a href="https://www.tiktok.com/@discoverymatt/video/7553811230767467807" target="_blank" class="block glass-card p-4 rounded-2xl text-sm">Highest-Rated Spots in Providence (165K+ views)</a>
     </div>
 
     <!-- Meal Toggle -->
     <div class="flex gap-3 mb-10">
-      <button onclick="setMealType('lunch')" id="lunch-btn"
-              class="flex-1 py-4 rounded-3xl font-semibold text-lg glass-btn">🍔 Lunch Now</button>
-      <button onclick="setMealType('dinner')" id="dinner-btn"
-              class="flex-1 py-4 rounded-3xl font-semibold text-lg bg-zinc-900 border border-white/10">🍝 Dinner</button>
+      <button onclick="setMealType('lunch')" id="lunch-btn" class="flex-1 py-4 rounded-3xl font-semibold text-lg glass-btn">🍔 Lunch Now</button>
+      <button onclick="setMealType('dinner')" id="dinner-btn" class="flex-1 py-4 rounded-3xl font-semibold text-lg bg-zinc-900 border border-white/10">🍝 Dinner</button>
     </div>
 
     <div id="results" class="space-y-6"></div>
 
-    <!-- Footer with Privacy Policy Link -->
     <div class="text-center text-xs text-zinc-500 mt-16 mb-8">
       <a href="privacy.html" class="hover:text-red-400">Privacy Policy</a>
     </div>
@@ -88,134 +70,172 @@
     </div>
   </div>
 
-  <!-- Make It Yourself Modal -->
-  <div id="diy-modal" class="hidden fixed inset-0 bg-black/90 flex items-end z-50" onclick="if(event.target===this) hideDiyModal()">
+  <!-- Menu Modal -->
+  <div id="menu-modal" class="hidden fixed inset-0 bg-black/80 flex items-end z-50" onclick="if(event.target===this) hideMenuModal()">
     <div onclick="event.stopImmediatePropagation()" class="bg-zinc-900 w-full rounded-t-3xl max-h-[85vh] overflow-auto p-6">
-      <div id="diy-content" class="space-y-6"></div>
+      <div id="menu-content"></div>
+    </div>
+  </div>
+
+  <!-- Make It Yourself Modal -->
+  <div id="diy-modal" class="hidden fixed inset-0 bg-black/80 flex items-end z-50" onclick="if(event.target===this) hideDiyModal()">
+    <div onclick="event.stopImmediatePropagation()" class="bg-zinc-900 w-full rounded-t-3xl max-h-[85vh] overflow-auto p-6">
+      <div id="diy-content"></div>
     </div>
   </div>
 
   <script>
-    // ==================== SECURITY NOTE ====================
-    // Replace this with your real Geoapify API key AFTER restricting it on geoapify.com
     const apiKey = "91ed2a3ad389497da600fc593f7a4596";
 
-    let restaurants = [];
+    let restaurants = [
+      {
+        id: 1,
+        name: "Chipotle",
+        cuisine: "Mexican",
+        dist: "0.4",
+        price: 9,
+        wait: 7,
+        rating: "4.6",
+        thumbnail: "https://images.unsplash.com/photo-1565299623644-8b8e3f8b8b8b",
+        reviewLink: "https://www.tiktok.com/@chipotle/video/7123456789012345678",
+        menu: [
+          {name: "Chicken Burrito Bowl", price: 9.25, description: "White rice, black beans, grilled chicken, fresh salsa, cheese, guacamole"},
+          {name: "Steak Tacos (3)", price: 9.75, description: "Corn tortillas, grilled steak, cilantro, onion, lime"},
+          {name: "Carnitas Quesadilla", price: 8.50, description: "Flour tortilla, slow-cooked pork, melted cheese"}
+        ]
+      },
+      {
+        id: 2,
+        name: "Federal Hill Pizza",
+        cuisine: "Italian",
+        dist: "1.1",
+        price: 12,
+        wait: 14,
+        rating: "4.8",
+        thumbnail: "https://images.unsplash.com/photo-1513104890138-7c749659a591",
+        reviewLink: "https://www.facebook.com/FederalHillPizzaProvidence/",
+        menu: [
+          {name: "Margherita Pizza", price: 11.99, description: "San Marzano tomato sauce, fresh mozzarella, basil"},
+          {name: "Pepperoni Pizza", price: 13.49, description: "Classic pepperoni, mozzarella, oregano"},
+          {name: "Meatball Calzone", price: 12.99, description: "House-made meatballs, ricotta, mozzarella"}
+        ]
+      },
+      {
+        id: 3,
+        name: "Wok & Roll",
+        cuisine: "Asian",
+        dist: "0.6",
+        price: 8,
+        wait: 5,
+        rating: "4.5",
+        thumbnail: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8",
+        reviewLink: "https://www.yelp.com/biz/wok-n-roll-providence",
+        menu: [
+          {name: "General Tso's Chicken", price: 9.25, description: "Crispy chicken, broccoli, sweet & spicy sauce"},
+          {name: "Beef Lo Mein", price: 9.75, description: "Egg noodles, flank steak, carrots, cabbage, soy sauce"},
+          {name: "Vegetable Fried Rice", price: 7.99, description: "Jasmine rice, mixed vegetables, egg, scallions"}
+        ]
+      }
+    ];
+
     let userFavorites = [];
-    let currentType = 'lunch';
 
     function loadFavorites() {
       try {
         const saved = localStorage.getItem('biteFavorites');
         if (saved) userFavorites = JSON.parse(saved);
-      } catch (e) {
-        userFavorites = [];
-      }
-    }
-
-    function saveFavorites() {
-      try {
-        localStorage.setItem('biteFavorites', JSON.stringify(userFavorites));
       } catch (e) {}
     }
 
-    async function getLiveLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-          document.getElementById('location-text').innerHTML = `Near You <span class="text-red-400 text-xs">(live)</span>`;
-          await fetchNearbyRestaurants(lat, lon);
-        }, () => {
-          document.getElementById('location-text').innerHTML = `Providence, RI`;
-          loadMockData();
-        });
-      }
-    }
-
-    async function fetchNearbyRestaurants(lat, lon) {
-      if (!apiKey || apiKey === "YOUR_GEOAPIFY_API_KEY_HERE") {
-        loadMockData();
-        return;
-      }
-      const url = `https://api.geoapify.com/v2/places?categories=catering.restaurant&filter=circle:${lon},${lat},2500&limit=12&apiKey=${apiKey}`;
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        restaurants = data.features.map(f => ({
-          id: f.properties.place_id || Math.random(),
-          name: f.properties.name || "Local Spot",
-          cuisine: (f.properties.categories?.[0] || "Food").split('.').pop(),
-          dist: (f.properties.distance / 1609).toFixed(1),
-          price: Math.floor(Math.random() * 9) + 7,
-          wait: Math.floor(Math.random() * 12) + 5,
-          rating: (4.3 + Math.random() * 0.7).toFixed(1)
-        }));
-        renderResults();
-      } catch (e) {
-        loadMockData();
-      }
-    }
-
-    function loadMockData() {
-      restaurants = [
-        {id:1, name:"Chipotle", cuisine:"Mexican", dist:"0.4", price:9, wait:7, rating:"4.6"},
-        {id:2, name:"Federal Hill Pizza", cuisine:"Italian", dist:"1.1", price:12, wait:14, rating:"4.8"},
-        {id:3, name:"Wok & Roll", cuisine:"Asian", dist:"0.6", price:8, wait:5, rating:"4.5"},
-        {id:5, name:"Taqueria Los Ojos", cuisine:"Mexican", dist:"0.8", price:7, wait:4, rating:"4.9"}
-      ];
-      renderResults();
+    function saveFavorites() {
+      try { localStorage.setItem('biteFavorites', JSON.stringify(userFavorites)); } catch (e) {}
     }
 
     function renderResults() {
       const container = document.getElementById('results');
       container.innerHTML = '';
       restaurants.forEach(r => {
-        const score = Math.round(100 - (parseFloat(r.dist)*12) - (r.wait*0.8) + (16 - r.price));
-        const isFav = userFavorites.includes(r.id);
         const html = `
-          <div class="glass-card rounded-3xl p-6">
-            <div class="flex justify-between items-start">
-              <div>
-                <h4 class="text-2xl font-semibold">${r.name}</h4>
-                <p class="text-zinc-400">${r.cuisine} • ${r.dist} mi</p>
+          <div class="glass-card rounded-3xl overflow-hidden">
+            <img src="${r.thumbnail}" class="w-full h-48 object-cover">
+            <div class="p-6">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="text-2xl font-semibold">${r.name}</h4>
+                  <p class="text-zinc-400">${r.cuisine} • ${r.dist} mi</p>
+                </div>
+                <span onclick="toggleFavorite(${r.id}); event.stopImmediatePropagation()" class="text-3xl cursor-pointer">❤️</span>
               </div>
-              <span onclick="toggleFavorite(${r.id}); event.stopImmediatePropagation()" class="text-3xl cursor-pointer ${isFav ? 'text-red-500' : 'text-zinc-400'}">❤️</span>
-            </div>
-            <div class="flex gap-6 mt-6 text-sm">
-              <div><i class="fa-solid fa-dollar-sign text-red-500"></i> $${r.price}</div>
-              <div><i class="fa-solid fa-clock text-red-500"></i> ${r.wait} min</div>
-              <div>⭐ ${r.rating}</div>
-            </div>
-            <div class="mt-6 flex gap-3">
-              <button onclick="orderNow('${r.name}')" class="flex-1 glass-btn text-white py-4 rounded-2xl font-medium">Order Now</button>
-              <button onclick="showDiyFor('${r.name}')" class="flex-1 border border-white/20 py-4 rounded-2xl font-medium">🍳 Make It Yourself</button>
+              <div class="flex gap-6 mt-4 text-sm">
+                <div><i class="fa-solid fa-dollar-sign text-red-500"></i> $${r.price}</div>
+                <div><i class="fa-solid fa-clock text-red-500"></i> ${r.wait} min</div>
+              </div>
+              <div class="mt-6 flex gap-3">
+                <button onclick="showMenu(${r.id})" class="flex-1 border border-white/20 py-4 rounded-2xl font-medium">View Menu</button>
+                <button onclick="orderNow('${r.name}')" class="flex-1 glass-btn text-white py-4 rounded-2xl font-medium">Order Now</button>
+              </div>
+              <a href="${r.reviewLink}" target="_blank" class="block mt-4 text-xs text-red-400 hover:text-red-300">See highest-viewed review →</a>
             </div>
           </div>`;
         container.innerHTML += html;
       });
     }
 
-    function toggleFavorite(id) {
-      if (userFavorites.includes(id)) {
-        userFavorites = userFavorites.filter(f => f !== id);
-      } else {
-        userFavorites.push(id);
-      }
-      saveFavorites();
-      renderResults();
+    function showMenu(id) {
+      const r = restaurants.find(x => x.id === id);
+      let html = `<h2 class="text-3xl font-bold mb-6">${r.name} Menu</h2>`;
+      r.menu.forEach(item => {
+        html += `
+          <div class="glass-card p-5 rounded-3xl mb-4">
+            <div class="flex justify-between">
+              <div>
+                <h4 class="font-semibold">${item.name}</h4>
+                <p class="text-zinc-400 text-sm">${item.description}</p>
+              </div>
+              <div class="text-right">
+                <span class="font-medium">$${item.price}</span><br>
+                <button onclick="showDiyFor('${item.name}', '${r.name}'); hideMenuModal()" class="text-xs text-red-400 mt-2">Make It Yourself</button>
+              </div>
+            </div>
+          </div>`;
+      });
+      document.getElementById('menu-content').innerHTML = html;
+      document.getElementById('menu-modal').classList.remove('hidden');
     }
 
-    function orderNow(name) {
-      window.open(`https://www.doordash.com/search/?q=${encodeURIComponent(name)}`, '_blank');
+    function hideMenuModal() {
+      document.getElementById('menu-modal').classList.add('hidden');
     }
 
-    function showDiyFor(name) {
+    function showDiyFor(itemName, restaurantName) {
+      hideMenuModal();
       const content = document.getElementById('diy-content');
       content.innerHTML = `
-        <h2 class="text-3xl font-bold mb-6">Make ${name} at Home</h2>
-        <p class="text-zinc-300 mb-8">Quick ingredients and steps to save money and time.</p>
-        <button onclick="hideDiyModal()" class="w-full py-5 glass-btn rounded-3xl font-semibold">Got it</button>
+        <h2 class="text-3xl font-bold mb-4">Make ${itemName} at Home</h2>
+        <p class="text-zinc-400 mb-6">Inspired by ${restaurantName} — ready in ~12 minutes</p>
+        
+        <div class="glass-card p-6 rounded-3xl mb-6">
+          <h4 class="font-semibold mb-3">Ingredients (1 serving)</h4>
+          <ul class="text-zinc-300 list-disc pl-5 space-y-1">
+            <li>Protein of choice (chicken, beef, or tofu)</li>
+            <li>Fresh vegetables (broccoli, peppers, onions)</li>
+            <li>Rice or noodles</li>
+            <li>Sauce base (soy, salsa, or marinara)</li>
+          </ul>
+        </div>
+        
+        <div class="glass-card p-6 rounded-3xl">
+          <h4 class="font-semibold mb-3">Instructions</h4>
+          <ol class="text-zinc-300 list-decimal pl-5 space-y-2">
+            <li>Cook rice or noodles according to package</li>
+            <li>Stir-fry protein until cooked through</li>
+            <li>Add vegetables and cook 3-4 minutes</li>
+            <li>Pour in sauce and toss everything together</li>
+            <li>Serve hot and enjoy!</li>
+          </ol>
+        </div>
+        
+        <button onclick="hideDiyModal()" class="w-full py-5 glass-btn rounded-3xl font-semibold mt-8">Start Cooking</button>
       `;
       document.getElementById('diy-modal').classList.remove('hidden');
     }
@@ -224,32 +244,34 @@
       document.getElementById('diy-modal').classList.add('hidden');
     }
 
+    function orderNow(name) {
+      window.open(`https://www.doordash.com/search/?q=${encodeURIComponent(name)}`, '_blank');
+    }
+
+    function toggleFavorite(id) {
+      if (userFavorites.includes(id)) userFavorites = userFavorites.filter(f => f !== id);
+      else userFavorites.push(id);
+      saveFavorites();
+      renderResults();
+    }
+
     function setMealType(type) {
       currentType = type;
-      const lunchBtn = document.getElementById('lunch-btn');
-      const dinnerBtn = document.getElementById('dinner-btn');
-      if (type === 'lunch') {
-        lunchBtn.className = 'flex-1 py-4 rounded-3xl font-semibold text-lg glass-btn';
-        dinnerBtn.className = 'flex-1 py-4 rounded-3xl font-semibold text-lg bg-zinc-900 border border-white/10';
-      } else {
-        lunchBtn.className = 'flex-1 py-4 rounded-3xl font-semibold text-lg bg-zinc-900 border border-white/10';
-        dinnerBtn.className = 'flex-1 py-4 rounded-3xl font-semibold text-lg glass-btn';
-      }
       renderResults();
     }
 
     function switchTab(tab) {
-      if (tab === 2) showDiyFor("a nearby meal");
+      if (tab === 2) showDiyFor("a popular item", "");
     }
 
     function toggleUserModal() {
-      alert("Your favorites are saved on this device.\nFull accounts coming soon.");
+      alert("Your favorites are saved locally on this device.");
     }
 
     // Initialize
     window.onload = () => {
       loadFavorites();
-      getLiveLocation();
+      renderResults();
     };
   </script>
 </body>
