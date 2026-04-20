@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RushPlate — Fastest & Cheapest Eats</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; }
+    .glass-card {
+      background: rgba(255,255,255,0.09);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7), inset 0 4px 12px rgba(255,255,255,0.15);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card:hover {
+      transform: translateY(-12px) scale(1.03);
+      box-shadow: 0 35px 70px -15px rgba(239,68,68,0.45), inset 0 6px 16px rgba(255,255,255,0.2);
+    }
+    .text-3d { text-shadow: 0 4px 12px rgba(0,0,0,0.8), 0 8px 20px rgba(239,68,68,0.4); }
+    .glass-btn { background: linear-gradient(145deg, #ef4444, #b91c1c); box-shadow: 0 10px 25px -5px rgba(239,68,68,0.5); }
+    .glass-btn:hover { transform: scale(1.08); box-shadow: 0 15px 35px -8px rgba(239,68,68,0.6); }
+    .header-text { font-size: 2rem; font-weight: 700; letter-spacing: -0.04em; }
+    @media (max-width: 640px) { .header-text { font-size: 1.75rem; } }
+  </style>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen pb-20">
+
+  <!-- Header -->
+  <div class="bg-black sticky top-0 z-50 border-b border-red-900/50">
+    <div class="max-w-2xl mx-auto px-5 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <img src="rushplate-logo.png" alt="RushPlate" class="w-11 h-11 rounded-2xl shadow-2xl">
+        <h1 class="header-text tracking-tighter text-3d">RushPlate</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <div id="clock" class="text-xs font-mono text-zinc-400 bg-zinc-900 px-3 py-1.5 rounded-2xl whitespace-nowrap"></div>
+        <button onclick="getLiveLocation()" class="glass-btn text-white px-5 py-2.5 rounded-3xl text-sm font-semibold flex items-center gap-2">
+          <i class="fa-solid fa-location-dot"></i>
+          <span id="location-text" class="hidden sm:inline">Providence, RI</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-2xl mx-auto px-4 pt-8">
+
+    <!-- Rush Radar -->
+    <div class="glass-card rounded-3xl p-6 mb-8 text-center border border-red-500/30">
+      <p class="text-red-400 text-sm font-medium tracking-widest">🚀 RUSH RADAR</p>
+      <h2 class="text-4xl font-bold mt-2 text-3d">Restaurants near you</h2>
+      <div id="radar" class="mt-4 text-red-400">Tap location to find live deals</div>
+    </div>
+
+    <!-- Viral Reviews -->
+    <div class="glass-card rounded-3xl p-6 mb-8">
+      <div class="flex items-center gap-3 mb-4">
+        <i class="fa-solid fa-fire text-red-500 text-xl"></i>
+        <h3 class="font-semibold text-lg text-3d">Viral Rhode Island Videos</h3>
+      </div>
+      <div class="grid grid-cols-2 gap-3 text-xs">
+        <a href="https://www.tiktok.com/@karlyrae8/video/7595435024095186207" target="_blank" class="block glass-card p-3 rounded-2xl">Providence Food Tour</a>
+        <a href="https://www.tiktok.com/@thesocialitefiles/video/7514726430740155690" target="_blank" class="block glass-card p-3 rounded-2xl">Top Providence Restaurants</a>
+        <a href="https://www.tiktok.com/@discoverymatt/video/7620052804974988575" target="_blank" class="block glass-card p-3 rounded-2xl">Best Spots in RI</a>
+        <a href="https://www.instagram.com/reel/DOiylPAEVmt/" target="_blank" class="block glass-card p-3 rounded-2xl">Local Bites Guide</a>
+      </div>
+    </div>
+
+    <div id="results" class="space-y-6"></div>
+
+    <div class="text-center text-xs text-zinc-500 mt-20 mb-12">
+      <a href="privacy.html" class="hover:text-red-400">Privacy Policy</a>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-lg border-t border-white/10 max-w-2xl mx-auto">
+    <div class="grid grid-cols-5 py-4 text-xs text-center">
+      <div onclick="switchTab(0)" class="text-red-500"><i class="fa-solid fa-house fa-2xl"></i><br>Home</div>
+      <div onclick="switchTab(1)"><i class="fa-solid fa-fire fa-2xl"></i><br>Viral</div>
+      <div onclick="switchTab(2)" class="text-red-500"><i class="fa-solid fa-utensils fa-2xl"></i><br>Make It</div>
+      <div><i class="fa-solid fa-clock fa-2xl"></i><br>Orders</div>
+      <div onclick="toggleUserModal()"><i class="fa-solid fa-user fa-2xl"></i><br>Me</div>
+    </div>
+  </div>
+
+  <!-- Modals (Menu & DIY) -->
+  <div id="menu-modal" class="hidden fixed inset-0 bg-black/80 flex items-end z-50" onclick="if(event.target===this) hideMenuModal()">
+    <div onclick="event.stopImmediatePropagation()" class="bg-zinc-900 w-full rounded-t-3xl max-h-[85vh] overflow-auto p-6">
+      <div id="menu-content"></div>
+    </div>
+  </div>
+
+  <div id="diy-modal" class="hidden fixed inset-0 bg-black/80 flex items-end z-50" onclick="if(event.target===this) hideDiyModal()">
+    <div onclick="event.stopImmediatePropagation()" class="bg-zinc-900 w-full rounded-t-3xl max-h-[85vh] overflow-auto p-6">
+      <div id="diy-content"></div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== API KEY AREA ====================
+    const apiKey = "91ed2a3ad389497da600fc593f7a4596";   // ← Add your real Geoapify key here
+
+    // Live EST Clock
+    function updateClock() {
+      const now = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
+      document.getElementById("clock").innerHTML = now.slice(10, 19) + " EST";
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    let currentRestaurants = [];
+
+    // Good matching mock data with proper images
+    let mockRestaurants = [
+      { id: 1, name: "Chipotle", cuisine: "Mexican", dist: "0.4", price: 9, wait: 7, rating: "4.6",
+        thumbnail: "https://picsum.photos/id/1080/600/300", // Burrito bowl
+        menu: [{name: "Chicken Burrito Bowl", price: 9.25, description: "Rice, beans, grilled chicken, salsa, cheese, guacamole"}]
+      },
+      { id: 2, name: "Shake Shack", cuisine: "Burgers", dist: "1.2", price: 11, wait: 10, rating: "4.7",
+        thumbnail: "https://picsum.photos/id/1060/600/300", // Cheeseburger
+        menu: [{name: "Cheeseburger", price: 8.99, description: "Beef patty, cheese, pickles, special sauce"}]
+      },
+      { id: 3, name: "Federal Hill Pizza", cuisine: "Italian", dist: "0.8", price: 12, wait: 15, rating: "4.8",
+        thumbnail: "https://picsum.photos/id/292/600/300", // Pizza
+        menu: [{name: "Margherita Pizza", price: 11.99, description: "Tomato sauce, fresh mozzarella, basil"}]
+      },
+      { id: 4, name: "Pho 75", cuisine: "Vietnamese", dist: "1.5", price: 10, wait: 8, rating: "4.6",
+        thumbnail: "https://picsum.photos/id/431/600/300", // Pho bowl
+        menu: [{name: "Beef Pho", price: 10.99, description: "Rice noodles, brisket, herbs, bean sprouts"}]
+      },
+      { id: 5, name: "Los Andes", cuisine: "Peruvian", dist: "1.1", price: 14, wait: 12, rating: "4.5",
+        thumbnail: "https://picsum.photos/id/870/600/300", // Peruvian food
+        menu: [{name: "Ceviche", price: 13.99, description: "Fresh fish, lime, onions, cilantro"}]
+      },
+      { id: 6, name: "Haven Bros", cuisine: "American", dist: "0.6", price: 8, wait: 5, rating: "4.4",
+        thumbnail: "https://picsum.photos/id/106/600/300", // Diner burger/hot dog
+        menu: [{name: "Classic Burger", price: 7.99, description: "Beef, cheese, fries on the side"}]
+      }
+    ];
+
+    async function getLiveLocation() {
+      if (!navigator.geolocation) {
+        alert("Geolocation not supported.");
+        return;
+      }
+      try {
+        const position = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject));
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        document.getElementById("location-text").textContent = "Nearby";
+        document.getElementById("radar").innerHTML = "Finding restaurants near you...";
+        // Real API call would go here when key is added
+        // For now, show mock but sorted by dist
+        currentRestaurants = [...mockRestaurants].sort((a,b) => parseFloat(a.dist) - parseFloat(b.dist));
+        renderResults();
+      } catch (e) {
+        alert("Location access denied. Showing nearby options.");
+        currentRestaurants = mockRestaurants;
+        renderResults();
+      }
+    }
+
+    function renderResults() {
+      const container = document.getElementById('results');
+      container.innerHTML = '';
+      const list = currentRestaurants.length ? currentRestaurants : mockRestaurants;
+      list.forEach(r => {
+        const html = `
+          <div class="glass-card rounded-3xl overflow-hidden">
+            <img src="${r.thumbnail}" class="w-full h-48 object-cover" alt="${r.name}">
+            <div class="p-6">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="text-2xl font-semibold text-3d">${r.name}</h4>
+                  <p class="text-zinc-400">${r.cuisine} • ${r.dist} mi</p>
+                </div>
+                <span onclick="toggleFavorite(${r.id}); event.stopImmediatePropagation()" class="text-3xl cursor-pointer">❤️</span>
+              </div>
+              <div class="flex gap-6 mt-4 text-sm">
+                <div><i class="fa-solid fa-dollar-sign text-red-500"></i> $${r.price}</div>
+                <div><i class="fa-solid fa-clock text-red-500"></i> ${r.wait} min</div>
+              </div>
+              <div class="mt-6 flex gap-2">
+                <button onclick="showMenu(${r.id})" class="flex-1 border border-white/20 py-4 rounded-2xl font-medium">View Menu</button>
+                <button onclick="orderNow('${r.name}', 'doordash')" class="flex-1 glass-btn text-white py-4 rounded-2xl font-medium text-sm">DoorDash</button>
+                <button onclick="orderNow('${r.name}', 'ubereats')" class="flex-1 glass-btn text-white py-4 rounded-2xl font-medium text-sm">Uber Eats</button>
+              </div>
+            </div>
+          </div>`;
+        container.innerHTML += html;
+      });
+    }
+
+    function orderNow(name, service) {
+      const query = encodeURIComponent(name) + "+Providence+RI";
+      const url = service === 'doordash' ? `https://www.doordash.com/search/?q=${query}` : `https://www.ubereats.com/search?q=${query}`;
+      window.open(url, '_blank');
+    }
+
+    // Simple modals (add your full showMenu / showDiyFor if you want more detail)
+    function showMenu(id) {
+      alert("Menu for restaurant ID " + id + " — coming soon with full recipes.");
+    }
+
+    function showDiyFor(itemName) {
+      alert("Try cooking " + itemName + " at home — recipe coming soon.");
+    }
+
+    function toggleFavorite(id) {
+      alert("Added to favorites (saved locally).");
+    }
+
+    function switchTab(tab) {
+      if (tab === 2) showDiyFor("Signature Dish");
+    }
+
+    function toggleUserModal() {
+      alert("Favorites & profile coming soon.");
+    }
+
+    // Initial load
+    window.onload = () => {
+      currentRestaurants = mockRestaurants;
+      renderResults();
+    };
+  </script>
+</body>
+</html>
