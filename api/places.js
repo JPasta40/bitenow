@@ -1,6 +1,10 @@
 export default async function handler(req) {
   try {
-    const url = new URL(req.url, `https://${req.headers.get('host') || 'rushplate.vercel.app'}`);
+    // Safe way to get headers and query params in Vercel
+    const headers = req.headers || {};
+    const host = headers.host || headers.get?.('host') || 'rushplate.vercel.app';
+
+    const url = new URL(req.url, `https://${host}`);
     const lat = url.searchParams.get('lat');
     const lon = url.searchParams.get('lon');
 
