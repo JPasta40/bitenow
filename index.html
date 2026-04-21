@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RushPlate — Fastest & Cheapest Eats</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = { content: ["*"] };
-  </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; }
@@ -19,9 +16,7 @@
       transition: all 0.3s ease;
     }
     .glass-card:hover { transform: translateY(-8px); }
-    .glass-btn { 
-      background: linear-gradient(145deg, #ef4444, #b91c1c); 
-    }
+    .glass-btn { background: linear-gradient(145deg, #ef4444, #b91c1c); }
   </style>
 </head>
 <body class="bg-zinc-950 text-white min-h-screen pb-20">
@@ -51,7 +46,7 @@
       const resultsDiv = document.getElementById('results');
 
       btn.textContent = "Finding eats...";
-      resultsDiv.innerHTML = `<p class="text-center py-12 text-zinc-400">Searching for real restaurants nearby...</p>`;
+      resultsDiv.innerHTML = `<p class="text-center py-12 text-zinc-400">Loading real restaurants nearby...</p>`;
 
       try {
         const res = await fetch('/api/places?lat=41.8240&lon=-71.4128');
@@ -93,7 +88,7 @@
       window.open(`https://www.ubereats.com/search?q=${q}`, '_blank');
     }
 
-    // Initial message
+    // Initial load
     window.onload = () => {
       document.getElementById('results').innerHTML = `
         <p class="text-center py-12 text-zinc-400">
@@ -102,4 +97,5 @@
     };
   </script>
 </body>
+</html>
 </html>
