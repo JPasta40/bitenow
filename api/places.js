@@ -1,8 +1,12 @@
 export default async function handler(request) {
   try {
-    const { searchParams } = new URL(request.url, `https://${request.headers.get('host') || 'rushplate.vercel.app'}`);
-    const lat = searchParams.get('lat');
-    const lon = searchParams.get('lon');
+    // Safest query param extraction for Vercel
+    const url = request.url || '';
+    const queryString = url.split('?')[1] || '';
+    const params = new URLSearchParams(queryString);
+
+    const lat = params.get('lat');
+    const lon = params.get('lon');
 
     if (!lat || !lon) {
       return new Response(
@@ -31,7 +35,7 @@ export default async function handler(request) {
     });
 
   } catch (error) {
-    console.error("Proxy error:", error);
+    console.error("Proxy error:", error.message);
     return new Response(
       JSON.stringify({ error: "Proxy failed: " + error.message }),
       { status: 500, headers: { "Content-Type": "application/json" } }
