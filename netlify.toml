@@ -2,3 +2,4 @@
   from = "/api/places"
   to = "/.netlify/functions/places"
   status = 200
+  force = true
